@@ -20,7 +20,13 @@ PlasmoidItem {
             id: page
             anchors.fill: parent
             title: i18n("OTP Accounts")
-            supportsRefreshing: false
+            supportsRefreshing: true
+            onRefreshingChanged: {
+                if (refreshing) {
+                    Keysmith.refresh()
+                    refreshing = false
+                }
+            }
 
             ColumnLayout {
                 anchors.fill: parent
@@ -186,6 +192,13 @@ PlasmoidItem {
                         icon.name: "document-import"
                         onClicked: importDialog.open()
                         Layout.fillWidth: true
+                        enabled: !Keysmith.locked && !Keysmith.needsSetup
+                    }
+
+                    QQC2.Button {
+                        icon.name: "view-refresh"
+                        onClicked: Keysmith.refresh()
+                        Layout.preferredWidth: height
                         enabled: !Keysmith.locked && !Keysmith.needsSetup
                     }
                 }

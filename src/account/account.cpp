@@ -362,6 +362,11 @@ bool AccountStorage::isLoaded(void) const
     Q_D(const AccountStorage);
     return d->isLoaded();
 }
+
+void AccountStorage::reload(void)
+{
+    load();
+}
 }
 
 #include "moc_account.cpp"

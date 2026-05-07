@@ -344,6 +344,14 @@ void KeysmithApplet::importAccountsFromFile(const QString &filePath, int format,
     refreshModel();
 }
 
+void KeysmithApplet::refresh(void)
+{
+    if (m_keysmith) {
+        m_keysmith->store().accounts()->reload();
+        refreshModel();
+    }
+}
+
 void KeysmithApplet::copyToClipboard(const QString &text)
 {
     if (!m_keysmith) {

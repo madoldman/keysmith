@@ -101,6 +101,7 @@ public:
     void clearError(void);
     bool hasError(void) const;
     bool isLoaded(void) const;
+    void reload(void);
 Q_SIGNALS:
     void added(const QString &fullName);
     void removed(const QString &fullName);
