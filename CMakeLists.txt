@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2019 Bhushan Shah <bshah@kde.org>
-# SPDX-FileCopyrightText: 2019 Friedrich W. H. Kossebau <kossebau@kde.org>
+# SPDX-FileCopyrightText: 2019 Friedrich W. H. Kossebau <kossebaulkde.org>
 # SPDX-FileCopyrightText: 2019-2020 Johan Ouwerkerk <jm.ouwerkerk@gmail.com>
 # SPDX-FileCopyrightText: 2021 Devin Lin <espidev@gmail.com>
 # SPDX-License-Identifier: BSD-2-Clause
@@ -92,7 +92,12 @@ if (NOT ANDROID)
     )
 endif()
 
+find_package(Plasma REQUIRED)
+find_package(PlasmaQuick REQUIRED)
+find_package(KF6Wallet REQUIRED)
+
 add_subdirectory(src)
+add_subdirectory(plasma/applet)
 
 if (ANDROID)
     add_subdirectory(android)

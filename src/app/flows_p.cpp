@@ -50,6 +50,9 @@ InitialFlow::InitialFlow(Keysmith *app)
     QObject::connect(m_passwordRequest, &model::PasswordRequest::passwordRequestChanged, this, &InitialFlow::resume);
     QObject::connect(m_passwordRequest, &model::PasswordRequest::passwordAccepted, this, &InitialFlow::resume);
     QObject::connect(accountListOf(m_app), &model::SimpleAccountListModel::loadedChanged, this, &InitialFlow::resume);
+
+    // Enable auto-unlock by default so KWallet-based unlock works
+    m_app->setAutoUnlockEnabled(true);
 }
 
 void InitialFlow::run(const QCommandLineParser &parser)
@@ -115,6 +118,29 @@ void InitialFlow::onNewAccountInvalid(void)
     navigationFor(m_app)->navigate(Navigation::Page::Error, vm);
 }
 
+void InitialFlow::tryAutoUnlock(void)
+{
+    if (!m_app->isAutoUnlockEnabled()) {
+        return;
+    }
+
+    if (m_passwordRequest->keyAvailable()) {
+        return;
+    }
+
+    if (!m_passwordRequest->previouslyDefined()) {
+        return;
+    }
+
+    qCDebug(logger) << "Attempting auto-unlock from wallet for Plasma applet...";
+    if (m_passwordRequest->autoUnlockFromWallet()) {
+        qCDebug(logger) << "Auto-unlock from wallet succeeded";
+        m_passwordPromptResolved = true;
+    } else {
+        qCDebug(logger) << "Auto-unlock from wallet failed, will prompt user";
+    }
+}
+
 void InitialFlow::resume(void)
 {
     if (!m_started) {
@@ -158,6 +184,13 @@ void InitialFlow::resume(void)
     }
 
     if (!m_passwordPromptResolved) {
+        tryAutoUnlock();
+
+        if (m_passwordRequest->keyAvailable()) {
+            resume();
+            return;
+        }
+
         if (m_passwordRequest->firstRun()) {
             m_passwordPromptResolved = true;
             auto vm = new SetupPasswordViewModel(m_passwordRequest);

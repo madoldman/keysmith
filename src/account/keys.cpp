@@ -6,6 +6,8 @@
 
 #include "../logging_p.h"
 
+#include <KWallet>
+
 #include <cstring>
 
 KEYSMITH_LOGGER(logger, ".accounts.keys")
@@ -231,6 +233,66 @@ bool AccountSecret::isPasswordAvailable(void) const
 bool AccountSecret::isChallengeAvailable(void) const
 {
     return m_stillAlive && m_challenge;
+}
+
+bool AccountSecret::autoUnlockFromWallet(void)
+{
+    if (!m_stillAlive || m_key) {
+        return false;
+    }
+
+    if (!m_keyParams || !m_salt) {
+        qCDebug(logger) << "Cannot auto-unlock from wallet: key parameters or salt not available";
+        return false;
+    }
+
+    using namespace KWallet;
+    Wallet *wallet = Wallet::openWallet(Wallet::NetworkWallet(), 0, Wallet::Synchronous);
+    if (!wallet) {
+        qCDebug(logger) << "Cannot auto-unlock from wallet: failed to open KDE wallet";
+        return false;
+    }
+
+    QString password;
+    if (wallet->readPassword(QStringLiteral("keysmith_master_password"), password) != 0) {
+        qCDebug(logger) << "Cannot auto-unlock from wallet: password not found in wallet";
+        delete wallet;
+        return false;
+    }
+
+    QByteArray passwordBytes = password.toUtf8();
+    m_password.reset(secrets::SecureMemory::allocate((size_t)passwordBytes.size()));
+    if (m_password) {
+        std::memcpy(m_password->data(), passwordBytes.constData(), m_password->size());
+    }
+    passwordBytes.fill('\0', -1);
+    password.fill(QLatin1Char('*'), -1);
+
+    if (m_password.isNull()) {
+        delete wallet;
+        return false;
+    }
+
+    deriveKey();
+    delete wallet;
+    return isKeyAvailable();
+}
+
+bool AccountSecret::storePasswordInWallet(const QString &password)
+{
+    using namespace KWallet;
+    Wallet *wallet = Wallet::openWallet(Wallet::NetworkWallet(), 0, Wallet::Synchronous);
+    if (!wallet) {
+        qCDebug(logger) << "Cannot store password in wallet: failed to open KDE wallet";
+        return false;
+    }
+
+    bool success = wallet->writePassword(QStringLiteral("keysmith_master_password"), password) == 0;
+    if (!success) {
+        qCDebug(logger) << "Cannot store password in wallet: writePassword failed";
+    }
+    delete wallet;
+    return success;
 }
 
 secrets::SecureMasterKey *AccountSecret::deriveKey(void)

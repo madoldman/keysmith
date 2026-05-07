@@ -1,0 +1,33 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "bshah@kde.org",
+                "Name": "Bhushan Shah"
+            },
+            {
+                "Email": "jm.ouwerkerk@gmail.com",
+                "Name": "Johan Ouwerkerk"
+            }
+        ],
+        "Category": "Utilities",
+        "Description": "OTP (One-Time Password) client for Plasma",
+        "Description[en_US]": "OTP (One-Time Password) client for Plasma",
+        "Icon": "org.kde.keysmith",
+        "Id": "org.kde.plasma.keysmith",
+        "License": "GPL-3.0-or-later",
+        "Name": "Keysmith",
+        "Name[en_US]": "Keysmith",
+        "Version": "1.0",
+        "Website": "https://github.com/kde/keysmith",
+        "EnabledByDefault": true
+    },
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-API": "declarativeappletscript",
+    "X-Plasma-MainScript": "ui/main.qml",
+    "X-Plasma-DefaultSize": {
+        "width": 250,
+        "height": 300
+    }
+}

@@ -67,8 +67,12 @@ bool PasswordRequest::provideBothPasswords(QString password, QString other)
         return false;
     }
 
+    // Save a copy of the password for KWallet storage before answerNewPassword clears it
+    const QString walletPassword = password;
+
     if (m_secret->answerNewPassword(password, *params)) {
         other.fill(QLatin1Char('*'), -1);
+        m_secret->storePasswordInWallet(walletPassword);
         return true;
     }
 
@@ -88,13 +92,26 @@ bool PasswordRequest::providePassword(QString password)
         return false;
     }
 
+    // Save a copy of the password for KWallet storage before answerExistingPassword clears it
+    const QString walletPassword = password;
+
     if (m_secret->answerExistingPassword(password)) {
         password.fill(QLatin1Char('*'), -1);
+        m_secret->storePasswordInWallet(walletPassword);
         return true;
     }
 
     qCDebug(logger) << "Failed to apply password for existing account secrets";
     return false;
+}
+
+bool PasswordRequest::autoUnlockFromWallet(void)
+{
+    if (m_haveKey) {
+        return true;
+    }
+
+    return m_secret->autoUnlockFromWallet();
 }
 
 void PasswordRequest::setKeyAvailable(void)

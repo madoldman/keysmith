@@ -17,5 +17,6 @@
 *.kate-swp
 *.kdev4
 .vscode
+.codebuddy
 /cmake-build*
 /CMakeLists.txt.user

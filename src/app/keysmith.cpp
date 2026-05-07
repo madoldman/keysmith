@@ -103,6 +103,7 @@ Keysmith::Keysmith(Navigation *navigation, QObject *parent)
     : QObject(parent)
     , m_store()
     , m_navigation(navigation)
+    , m_autoUnlockEnabled(false)
 {
 }
 
@@ -134,12 +135,22 @@ void Keysmith::copyToClipboard(const QString &text)
 
 model::SimpleAccountListModel *Keysmith::accountListModel(void)
 {
-    return new model::SimpleAccountListModel(m_store.accounts(), this);
+    return m_store.accountList();
 }
 
 model::PasswordRequest *Keysmith::passwordRequest(void)
 {
     return new model::PasswordRequest(m_store.accounts()->secret(), this);
+}
+
+void Keysmith::setAutoUnlockEnabled(bool enabled)
+{
+    m_autoUnlockEnabled = enabled;
+}
+
+bool Keysmith::isAutoUnlockEnabled(void) const
+{
+    return m_autoUnlockEnabled;
 }
 }
 

@@ -79,6 +79,8 @@ public:
     Q_INVOKABLE void copyToClipboard(const QString &text);
     Q_INVOKABLE model::SimpleAccountListModel *accountListModel(void);
     Q_INVOKABLE model::PasswordRequest *passwordRequest(void);
+    Q_INVOKABLE void setAutoUnlockEnabled(bool enabled);
+    Q_INVOKABLE bool isAutoUnlockEnabled(void) const;
 
 private:
     accounts::AccountStorage *storage(void);
@@ -86,6 +88,7 @@ private:
 private:
     Store m_store;
     Navigation *const m_navigation;
+    bool m_autoUnlockEnabled;
 };
 }
 

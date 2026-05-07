@@ -7,6 +7,7 @@
 
 #include <QByteArray>
 #include <QObject>
+#include <QString>
 
 #include "../secrets/secrets.h"
 
@@ -48,6 +49,9 @@ public:
     bool isPasswordAvailable(void) const;
     bool isChallengeAvailable(void) const;
 
+    Q_INVOKABLE bool autoUnlockFromWallet(void);
+    Q_INVOKABLE bool storePasswordInWallet(const QString &password);
+
 private:
     bool acceptPassword(QString &password, bool answerMatchesRequest);
 
@@ -55,7 +59,7 @@ private:
     bool m_stillAlive;
     bool m_newPassword;
     bool m_passwordRequested;
-    bool m_hackWithoutChallenge; // HACK: disables challenge verification, remove at some point!
+    bool m_hackWithoutChallenge;
     const secrets::SecureRandom m_random;
     std::optional<QByteArray> m_salt;
     std::optional<secrets::EncryptedSecret> m_challenge;

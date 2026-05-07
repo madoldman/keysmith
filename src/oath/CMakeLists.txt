@@ -7,4 +7,5 @@ set(oath_SRCS
 )
 
 add_library(oath_lib STATIC ${oath_SRCS})
+set_target_properties(oath_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_link_libraries(oath_lib Qt::Core hmac_lib)

@@ -360,13 +360,13 @@ static void readAndOTP(QVector<AccountInput *> &ret, const QByteArray &data)
         account->setTokenLength(otp["digits"_L1].toInt());
 
         QString type(otp["type"_L1].toString());
-        if (type == "TOPT"_L1) {
+        if (type.compare("totp"_L1, Qt::CaseInsensitive) == 0) {
             account->setType(AccountInput::Totp);
             account->setTimeStep(otp["period"_L1].toInt());
-        } else if (type == "HOPT"_L1) {
+        } else if (type.compare("hotp"_L1, Qt::CaseInsensitive) == 0) {
             account->setType(AccountInput::Hotp);
             account->setCounter(otp["counter"_L1].toInt());
-        } else if (type == "Steam"_L1) {
+        } else if (type.compare("steam"_L1, Qt::CaseInsensitive) == 0) {
             account->setType(AccountInput::Totp);
             account->setTimeStep(otp["period"_L1].toInt());
             if (account->timeStep() == 0) {
@@ -376,11 +376,11 @@ static void readAndOTP(QVector<AccountInput *> &ret, const QByteArray &data)
         }
 
         QString algo(otp["algorithm"_L1].toString());
-        if (algo == "SHA1"_L1) {
+        if (algo.compare("SHA1"_L1, Qt::CaseInsensitive) == 0) {
             account->setAlgorithm(AccountInput::Sha1);
-        } else if (algo == "SHA256"_L1) {
+        } else if (algo.compare("SHA256"_L1, Qt::CaseInsensitive) == 0) {
             account->setAlgorithm(AccountInput::Sha256);
-        } else if (algo == "SHA512"_L1) {
+        } else if (algo.compare("SHA512"_L1, Qt::CaseInsensitive) == 0) {
             account->setAlgorithm(AccountInput::Sha512);
         }
 
@@ -411,13 +411,13 @@ static void readAegis(QVector<AccountInput *> &ret, const QByteArray &data)
         account->setTokenLength(info["digits"_L1].toInt());
 
         QString type(otp["type"_L1].toString());
-        if (type == "TOPT"_L1) {
+        if (type.compare("totp"_L1, Qt::CaseInsensitive) == 0) {
             account->setType(AccountInput::Totp);
             account->setTimeStep(info["period"_L1].toInt());
-        } else if (type == "HOPT"_L1) {
+        } else if (type.compare("hotp"_L1, Qt::CaseInsensitive) == 0) {
             account->setType(AccountInput::Hotp);
             account->setCounter(info["counter"_L1].toInt());
-        } else if (type == "Steam"_L1) {
+        } else if (type.compare("steam"_L1, Qt::CaseInsensitive) == 0) {
             account->setType(AccountInput::Totp);
             account->setTimeStep(info["period"_L1].toInt());
             if (account->timeStep() == 0) {
@@ -426,12 +426,12 @@ static void readAegis(QVector<AccountInput *> &ret, const QByteArray &data)
             account->setIssuer("Steam"_L1);
         }
 
-        QString algo(otp["algorithm"_L1].toString());
-        if (algo == "SHA1"_L1) {
+        QString algo(info["algo"_L1].toString());
+        if (algo.compare("SHA1"_L1, Qt::CaseInsensitive) == 0) {
             account->setAlgorithm(AccountInput::Sha1);
-        } else if (algo == "SHA256"_L1) {
+        } else if (algo.compare("SHA256"_L1, Qt::CaseInsensitive) == 0) {
             account->setAlgorithm(AccountInput::Sha256);
-        } else if (algo == "SHA512"_L1) {
+        } else if (algo.compare("SHA512"_L1, Qt::CaseInsensitive) == 0) {
             account->setAlgorithm(AccountInput::Sha512);
         }
 

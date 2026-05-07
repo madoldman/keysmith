@@ -13,6 +13,9 @@ set(keysmith_SRCS
 
 add_library(keysmith_lib STATIC ${keysmith_SRCS})
 set_target_properties(keysmith_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+kconfig_add_kcfg_files(keysmith_lib GENERATE_MOC ../stateconfig.kcfgc)
+
 target_link_libraries(keysmith_lib
     PUBLIC
         Qt::Core
@@ -20,6 +23,8 @@ target_link_libraries(keysmith_lib
         Qt::Qml
         Qt::Concurrent
         KF6::I18n
+        KF6::ConfigCore
+        KF6::ConfigGui
         model_lib
         account_lib
 )

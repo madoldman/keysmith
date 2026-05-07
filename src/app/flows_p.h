@@ -29,6 +29,7 @@ private Q_SLOTS:
     void onNewAccountAccepted(void);
     void onNewAccountRejected(void);
     void resume(void);
+    void tryAutoUnlock(void);
 
 private:
     bool m_started;

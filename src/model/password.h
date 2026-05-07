@@ -26,6 +26,7 @@ public:
 public:
     Q_INVOKABLE bool providePassword(QString password);
     Q_INVOKABLE bool provideBothPasswords(QString password, QString other);
+    Q_INVOKABLE bool autoUnlockFromWallet(void);
 Q_SIGNALS:
     void passwordRequestChanged(void);
     void passwordExists(void);

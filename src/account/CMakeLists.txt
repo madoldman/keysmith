@@ -12,4 +12,5 @@ set(account_SRCS
 )
 
 add_library(account_lib STATIC ${account_SRCS})
-target_link_libraries(account_lib Qt::Core base32_lib oath_lib secrets_lib)
+set_target_properties(account_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
+target_link_libraries(account_lib Qt::Core base32_lib oath_lib secrets_lib KF6::Wallet)
