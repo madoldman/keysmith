@@ -55,6 +55,14 @@ void KeysmithApplet::init(QQmlEngine *engine)
         refreshModel();
     });
 
+    // When accounts are added/removed asynchronously, refresh the accounts model
+    connect(m_keysmith->store().accounts(), &accounts::AccountStorage::added, this, [this]() {
+        refreshModel();
+    });
+    connect(m_keysmith->store().accounts(), &accounts::AccountStorage::removed, this, [this]() {
+        refreshModel();
+    });
+
     // Directly connect to AccountSecret signals for reliable cross-thread delivery
     connect(m_secret, &accounts::AccountSecret::keyAvailable, this, [this]() {
         setLocked(false);
@@ -195,6 +203,20 @@ void AccountsModel::setSourceModel(model::SimpleAccountListModel *source)
                 connect(account, &model::AccountView::tokenChanged, this, &AccountsModel::onTokenChanged);
             }
         }
+        std::sort(m_accounts.begin(), m_accounts.end(), [](const model::AccountView *a, const model::AccountView *b) {
+            const QString aIssuer = a->issuer();
+            const QString bIssuer = b->issuer();
+            if (aIssuer.isNull() && !bIssuer.isNull())
+                return true;
+            if (!aIssuer.isNull() && bIssuer.isNull())
+                return false;
+            if (!aIssuer.isNull() && !bIssuer.isNull()) {
+                int cmp = aIssuer.localeAwareCompare(bIssuer);
+                if (cmp != 0)
+                    return cmp < 0;
+            }
+            return a->name().localeAwareCompare(b->name()) < 0;
+        });
     }
 
     endResetModel();
@@ -279,7 +301,6 @@ void KeysmithApplet::addAccount(const QString &name, const QString &secret)
     input.setType(model::AccountInput::Totp);
 
     m_keysmith->accountListModel()->addAccount(&input);
-    refreshModel();
 }
 
 void KeysmithApplet::addAccountEx(const QString &name,
@@ -321,7 +342,6 @@ void KeysmithApplet::addAccountEx(const QString &name,
     }
 
     m_keysmith->accountListModel()->addAccount(&input);
-    refreshModel();
 }
 
 void KeysmithApplet::importAccountsFromFile(const QString &filePath, int format, const QString &password)
@@ -340,16 +360,45 @@ void KeysmithApplet::importAccountsFromFile(const QString &filePath, int format,
         m_keysmith->accountListModel()->addAccount(accInput);
         delete accInput;
     }
+}
 
-    refreshModel();
+void KeysmithApplet::removeAccount(int row)
+{
+    if (row < 0 || row >= m_accountsModel->m_accounts.count()) {
+        return;
+    }
+    Q_EMIT m_accountsModel->m_accounts[row]->remove();
 }
 
 void KeysmithApplet::refresh(void)
 {
-    if (m_keysmith) {
-        m_keysmith->store().accounts()->reload();
-        refreshModel();
+    if (!m_keysmith) {
+        return;
     }
+
+    // Remove accounts from the model that no longer exist in storage
+    // (e.g. deleted in the desktop app), then reload to pick up new ones.
+    accounts::AccountStorage *storage = m_keysmith->store().accounts();
+    model::SimpleAccountListModel *sourceModel = m_keysmith->accountListModel();
+
+    QList<QString> diskAccounts = storage->accounts();
+    QSet<QString> diskSet(diskAccounts.constBegin(), diskAccounts.constEnd());
+
+    // Trigger removal for accounts in the model that are missing from disk
+    for (int i = 0; i < sourceModel->rowCount(); ++i) {
+        QVariant data = sourceModel->data(sourceModel->index(i), model::SimpleAccountListModel::AccountRole);
+        model::AccountView *account = qvariant_cast<model::AccountView *>(data);
+        if (account) {
+            QString issuer = account->issuer();
+            QString fullName = issuer.isNull() ? account->name() : issuer + QLatin1Char(':') + account->name();
+            if (!diskSet.contains(fullName)) {
+                Q_EMIT account->remove();
+            }
+        }
+    }
+
+    storage->reload();
+    refreshModel();
 }
 
 void KeysmithApplet::copyToClipboard(const QString &text)

@@ -16,17 +16,10 @@ PlasmoidItem {
     fullRepresentation: PlasmaExtras.Representation {
         collapseMarginsHint: true
 
-        Kirigami.ScrollablePage {
+        Kirigami.Page {
             id: page
             anchors.fill: parent
             title: i18n("OTP Accounts")
-            supportsRefreshing: true
-            onRefreshingChanged: {
-                if (refreshing) {
-                    Keysmith.refresh()
-                    refreshing = false
-                }
-            }
 
             ColumnLayout {
                 anchors.fill: parent
@@ -208,6 +201,13 @@ PlasmoidItem {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     model: Keysmith.accountsModel
+                    clip: true
+                    rightMargin: Kirigami.Units.smallSpacing
+
+                    QQC2.ScrollBar.vertical: QQC2.ScrollBar {
+                        policy: QQC2.ScrollBar.AsNeeded
+                        background: Item {}
+                    }
 
                     delegate: QQC2.ItemDelegate {
                         id: listItem
@@ -230,6 +230,8 @@ PlasmoidItem {
                             }
                         }
 
+                        onPressAndHold: deleteConfirmDialog.accountIndex = index, deleteConfirmDialog.accountName = name, deleteConfirmDialog.accountIssuer = issuer, deleteConfirmDialog.open()
+
                         contentItem: Column {
                             id: col
                             spacing: 2
@@ -241,14 +243,32 @@ PlasmoidItem {
                                 width: col.width
                             }
 
-                            QQC2.Label {
-                                id: tokenLbl
-                                text: token.length > 0 ? token : "..."
-                                font.bold: true
-                                font.pointSize: Math.round(Kirigami.Theme.defaultFont.pointSize * 1.4)
-                                color: Kirigami.Theme.textColor
-                                opacity: 0.95
+                            RowLayout {
                                 width: col.width
+                                spacing: Kirigami.Units.smallSpacing
+
+                                QQC2.Label {
+                                    id: tokenLbl
+                                    text: token.length > 0 ? token : "..."
+                                    font.bold: true
+                                    font.pointSize: Math.round(Kirigami.Theme.defaultFont.pointSize * 1.4)
+                                    color: Kirigami.Theme.textColor
+                                    opacity: 0.95
+                                    Layout.fillWidth: true
+                                }
+
+                                QQC2.Button {
+                                    icon.name: "edit-delete"
+                                    implicitWidth: implicitHeight
+                                    QQC2.ToolTip.visible: hovered
+                                    QQC2.ToolTip.text: i18n("Delete account")
+                                    onClicked: {
+                                        deleteConfirmDialog.accountIndex = listItem.index
+                                        deleteConfirmDialog.accountName = listItem.name
+                                        deleteConfirmDialog.accountIssuer = listItem.issuer
+                                        deleteConfirmDialog.open()
+                                    }
+                                }
                             }
                         }
 
@@ -308,6 +328,71 @@ PlasmoidItem {
                         text: Keysmith.locked ? i18n("Accounts are locked") : i18n("No accounts added")
                         icon.name: Keysmith.locked ? "lock" : "unlock"
                     }
+                }
+            }
+
+            QQC2.Dialog {
+                id: deleteConfirmDialog
+                property int accountIndex: -1
+                property string accountName: ""
+                property string accountIssuer: ""
+                title: i18n("Removing account: %1", accountIssuer.length > 0 ? accountIssuer + " (" + accountName + ")" : accountName)
+                width: Math.min(380, page.width - Kirigami.Units.largeSpacing * 4)
+                modal: true
+                visible: false
+                closePolicy: QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside
+
+                contentItem: Flickable {
+                    clip: true
+                    contentHeight: deleteConfirmContent.height
+                    implicitHeight: Math.min(deleteConfirmContent.implicitHeight, page.height * 0.6)
+
+                    ColumnLayout {
+                        id: deleteConfirmContent
+                        width: parent.width
+                        spacing: Kirigami.Units.smallSpacing
+
+                        QQC2.Label {
+                            text: i18n("<p><ul><li>Account name: %1</li><li>Account issuer: %2</li></ul></p>" +
+                                       "<p>Removing this account from Keysmith will not disable two-factor " +
+                                       "authentication (2FA). Make sure you can still access your account " +
+                                       "without using Keysmith before proceeding:</p>" +
+                                       "<ul><li>Make sure you have another 2FA app set up for your account, or:</li>" +
+                                       "<li>Make sure you have recovery codes for your account, or:</li>" +
+                                       "<li>Disable two-factor authentication on your account</li></ul>",
+                                       deleteConfirmDialog.accountName,
+                                       deleteConfirmDialog.accountIssuer.length > 0 ? deleteConfirmDialog.accountIssuer : i18n("N/A"))
+                            Layout.fillWidth: true
+                            wrapMode: Text.WordWrap
+                        }
+                    }
+                }
+
+                footer: QQC2.DialogButtonBox {
+                    QQC2.Button {
+                        text: i18n("Cancel")
+                        QQC2.DialogButtonBox.buttonRole: QQC2.DialogButtonBox.RejectRole
+                    }
+                    QQC2.Button {
+                        icon.name: "edit-delete"
+                        text: i18n("Delete Account")
+                        QQC2.DialogButtonBox.buttonRole: QQC2.DialogButtonBox.AcceptRole
+                    }
+                }
+
+                onAccepted: {
+                    if (accountIndex >= 0) {
+                        Keysmith.removeAccount(accountIndex)
+                    }
+                    accountIndex = -1
+                    accountName = ""
+                    accountIssuer = ""
+                }
+
+                onRejected: {
+                    accountIndex = -1
+                    accountName = ""
+                    accountIssuer = ""
                 }
             }
 

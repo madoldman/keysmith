@@ -118,6 +118,7 @@ public:
                                   bool useFixedTruncation,
                                   int truncationOffset);
     Q_INVOKABLE void importAccountsFromFile(const QString &filePath, int format, const QString &password);
+    Q_INVOKABLE void removeAccount(int row);
     Q_INVOKABLE void copyToClipboard(const QString &text);
     Q_INVOKABLE bool providePassword(const QString &password);
     Q_INVOKABLE bool provideNewPassword(const QString &password, const QString &confirm);
