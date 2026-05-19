@@ -6,13 +6,13 @@
 # André Marcelo Alvarenga <alvarenga@kde.org>, 2020.
 # Geraldo Simiao <geraldosimiao@fedoraproject.org>, 2023.
 # SPDX-FileCopyrightText: 2025 Guilherme Marçal Silva <guimarcalsilva@gmail.com>
-# SPDX-FileCopyrightText: 2025 Marcus Gama <marcus.gama@gmail.com>
+# SPDX-FileCopyrightText: 2025-2026 Marcus Gama <marcus.gama@gmail.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: keysmith\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2026-04-21 00:49+0000\n"
-"PO-Revision-Date: 2025-08-06 20:45-0300\n"
+"POT-Creation-Date: 2026-05-15 00:48+0000\n"
+"PO-Revision-Date: 2026-05-15 04:45-0300\n"
 "Last-Translator: Marcus Gama <marcus.gama@gmail.com>\n"
 "Language-Team: Brazilian Portuguese <kde-i18n-pt_BR@kde.org>\n"
 "Language: pt_BR\n"
@@ -20,7 +20,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Lokalize 25.04.3\n"
+"X-Generator: Lokalize 26.04.1\n"
 
 #: src/app/cli.cpp:133
 #, kde-format
@@ -380,37 +380,43 @@ msgctxt "@item:inlistbox"
 msgid "FreeOTP URIs"
 msgstr "FreeOTP URIs"
 
-#: src/contents/ui/ImportAccount.qml:83
+#: src/contents/ui/ImportAccount.qml:68
+#, kde-format
+msgctxt "@item:inlistbox"
+msgid "SailOTP manually decrypted json"
+msgstr "JSON descriptografado manualmente pelo SailOTP"
+
+#: src/contents/ui/ImportAccount.qml:84
 #, kde-format
 msgctxt "@label:chooser"
 msgid "Backup file:"
 msgstr "Arquivo de backup:"
 
-#: src/contents/ui/ImportAccount.qml:86
+#: src/contents/ui/ImportAccount.qml:87
 #, kde-format
 msgctxt "@info:placeholder"
 msgid "No file selected"
 msgstr "Nenhum arquivo selecionado"
 
-#: src/contents/ui/ImportAccount.qml:90
+#: src/contents/ui/ImportAccount.qml:91
 #, kde-format
 msgctxt "@title:window"
 msgid "Select file"
 msgstr "Selecionar arquivo"
 
-#: src/contents/ui/ImportAccount.qml:104
+#: src/contents/ui/ImportAccount.qml:105
 #, kde-format
 msgctxt "@info:placeholder"
 msgid "Decryption password"
 msgstr "Senha de descriptografia"
 
-#: src/contents/ui/ImportAccount.qml:106 src/contents/ui/UnlockAccounts.qml:49
+#: src/contents/ui/ImportAccount.qml:107 src/contents/ui/UnlockAccounts.qml:49
 #, kde-format
 msgctxt "@label:textbox"
 msgid "Password:"
 msgstr "Senha:"
 
-#: src/contents/ui/ImportAccount.qml:117
+#: src/contents/ui/ImportAccount.qml:118
 #, kde-format
 msgctxt "@action:button"
 msgid "Import"
