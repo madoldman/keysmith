@@ -500,6 +500,7 @@ QVector<AccountInput *> ImportInput::importAccounts() const
         break;
     case SailOTPDecryptedJson:
         readSailOtpDecryptedJson(ret, data);
+        break;
     default:
         break;
     }

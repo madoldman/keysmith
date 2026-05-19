@@ -427,7 +427,8 @@ PlasmoidItem {
                             i18n("andOTP Encrypted JSON"),
                             i18n("andOTP Plain JSON"),
                             i18n("Aegis Plain JSON"),
-                            i18n("FreeOTP URIs")
+                            i18n("FreeOTP URIs"),
+                            i18n("SailOTP manually decrypted json")
                         ]
                         onCurrentIndexChanged: {
                             importDialog.selectedFormat = currentIndex
@@ -496,7 +497,7 @@ PlasmoidItem {
                 }
 
                 onAccepted: {
-                    var formatMap = [2, 1, 3, 0]
+                    var formatMap = [2, 1, 3, 0, 5]
                     Keysmith.importAccountsFromFile(filePathField.text, formatMap[formatCombo.currentIndex], passwordField.text)
                     filePathField.text = ""
                     passwordField.text = ""
