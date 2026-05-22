@@ -355,10 +355,9 @@ void KeysmithApplet::importAccountsFromFile(const QString &filePath, int format,
     input.setFormat(static_cast<model::ImportInput::ImportFormat>(format));
     input.setPassword(password);
 
-    QVector<model::AccountInput *> accounts = input.importAccounts();
-    for (model::AccountInput *accInput : accounts) {
-        m_keysmith->accountListModel()->addAccount(accInput);
-        delete accInput;
+    std::vector<std::unique_ptr<model::AccountInput>> accounts = input.importAccounts();
+    for (std::unique_ptr<model::AccountInput> &accInput : accounts) {
+        m_keysmith->accountListModel()->addAccount(accInput.get());
     }
 }
 
