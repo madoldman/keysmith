@@ -13,6 +13,12 @@ import org.kde.plasma.private.keysmith
 PlasmoidItem {
     id: root
 
+    onExpandedChanged: {
+        if (expanded && !Keysmith.locked && !Keysmith.needsSetup) {
+            Keysmith.recomputeAll()
+        }
+    }
+
     fullRepresentation: PlasmaExtras.Representation {
         collapseMarginsHint: true
 
@@ -218,7 +224,7 @@ PlasmoidItem {
                         required property int timeStep
                         required property int index
 
-                        property real healthIndicator: 0
+                        property real healthIndicator: isTotp && index >= 0 ? Keysmith.accountsModel.millisecondsLeftForToken(index) : 0
                         property real totpInterval: isTotp ? 1000 * timeStep : 0
 
                         width: ListView.view.width - ListView.view.leftMargin - ListView.view.rightMargin
@@ -294,9 +300,9 @@ PlasmoidItem {
                             id: countdownAnim
                             target: listItem
                             property: "healthIndicator"
-                            from: listItem.totpInterval
+                            from: listItem.isTotp && listItem.index >= 0 ? Keysmith.accountsModel.millisecondsLeftForToken(listItem.index) : 0
                             to: 0
-                            duration: listItem.totpInterval
+                            duration: listItem.isTotp && listItem.index >= 0 ? Keysmith.accountsModel.millisecondsLeftForToken(listItem.index) : 0
                             running: listItem.isTotp && listItem.visible
                         }
 

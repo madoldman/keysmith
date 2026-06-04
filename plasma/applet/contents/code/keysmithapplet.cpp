@@ -400,6 +400,11 @@ void KeysmithApplet::refresh(void)
     refreshModel();
 }
 
+void KeysmithApplet::recomputeAll(void)
+{
+    m_accountsModel->triggerRecompute();
+}
+
 void KeysmithApplet::copyToClipboard(const QString &text)
 {
     if (!m_keysmith) {

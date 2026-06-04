@@ -123,6 +123,7 @@ public:
     Q_INVOKABLE bool providePassword(const QString &password);
     Q_INVOKABLE bool provideNewPassword(const QString &password, const QString &confirm);
     Q_INVOKABLE void refresh();
+    Q_INVOKABLE void recomputeAll();
 
 Q_SIGNALS:
     void lockedChanged(void);
