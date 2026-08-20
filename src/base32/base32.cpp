@@ -216,6 +216,43 @@ static size_t requiredCapacity(int paddingIndex, int from, int until)
 
 namespace base32
 {
+
+QString encode(const QByteArray &data)
+{
+    static const char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+    QString result;
+    result.reserve(((data.size() * 8) + 4) / 5); // upper bound for encoded length
+
+    int i = 0;
+    int size = data.size();
+
+    while (i < size) {
+        // Collect up to 5 bytes (40 bits) for one group
+        quint64 buffer = 0ULL;
+        int bytesAvailable = qMin(5, size - i);
+
+        for (int j = 0; j < bytesAvailable; ++j) {
+            buffer = (buffer << 8) | (static_cast<unsigned char>(data[i + j]) & 0xFFULL);
+        }
+        i += bytesAvailable;
+
+        // Shift left to fill remaining bits with zeros for padding calculation
+        buffer <<= (5 - bytesAvailable) * 8;
+
+        // Encode 8 characters per group of 5 bytes
+        int charsOut = (bytesAvailable * 8 + 4) / 5; // ceiling division
+        for (int j = 0; j < 8; ++j) {
+            if (j < charsOut) {
+                result.append(QLatin1Char(alphabet[(buffer >> (35 - j * 5)) & 0x1FULL]));
+            } else {
+                result.append(QLatin1Char('='));
+            }
+        }
+    }
+
+    return result;
+}
+
 std::optional<size_t> validate(const QString &encoded, int from, int until)
 {
     int max = until == -1 ? encoded.size() : until;

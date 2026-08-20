@@ -162,6 +162,12 @@ void AccountsOverviewViewModel::importAccount(void)
     flow->run();
 }
 
+void AccountsOverviewViewModel::exportAccount(void)
+{
+    auto flow = new ManualExportAccountFlow(m_app);
+    flow->run();
+}
+
 void AccountsOverviewViewModel::scanQRCode(void)
 {
     auto flow = new AddAccountFromQRFlow(m_app);
@@ -226,6 +232,29 @@ void UnlockAccountsViewModel::unlock(const QString &password)
         m_failed = result;
         Q_EMIT failedChanged();
     }
+}
+
+ExportAccountViewModel::ExportAccountViewModel(model::ExportOutput *output, model::SimpleAccountListModel *accounts, bool quitEnabled, QObject *parent)
+    : QObject(parent)
+    , m_output(output)
+    , m_accounts(accounts)
+    , m_quitEnabled(quitEnabled)
+{
+}
+
+model::ExportOutput *ExportAccountViewModel::output(void) const
+{
+    return m_output;
+}
+
+model::SimpleAccountListModel *ExportAccountViewModel::accounts(void) const
+{
+    return m_accounts;
+}
+
+bool ExportAccountViewModel::quitEnabled(void) const
+{
+    return m_quitEnabled;
 }
 
 ScanQRViewModel::ScanQRViewModel(QObject *parent)

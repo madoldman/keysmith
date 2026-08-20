@@ -198,6 +198,12 @@ msgstr "导入"
 
 #: src/contents/ui/AccountsOverview.qml:189
 #, kde-format
+msgctxt "@action:button export accounts, shown in toolbar"
+msgid "Export"
+msgstr "导出"
+
+#: src/contents/ui/AccountsOverview.qml:202
+#, kde-format
 msgctxt ""
 "@action:button import an account by scanning a QR code, shown in toolbar"
 msgid "Scan QR Code"
@@ -286,6 +292,35 @@ msgctxt "@action:button Dismiss the error page and quit Keysmtih"
 msgid "Quit"
 msgstr "退出"
 
+#: src/contents/ui/ExportAccount.qml:19
+#, kde-format
+msgctxt "@title:window"
+msgid "Export Accounts"
+msgstr "导出账户"
+
+#: src/contents/ui/ExportAccount.qml:42
+#, kde-format
+msgid "Export format"
+msgstr "导出格式"
+
+#: src/contents/ui/ExportAccount.qml:65
+#, kde-format
+msgctxt "@label:chooser"
+msgid "Export file:"
+msgstr "导出文件："
+
+#: src/contents/ui/ExportAccount.qml:72
+#, kde-format
+msgctxt "@title:window"
+msgid "Select export file"
+msgstr "选择导出文件"
+
+#: src/contents/ui/ExportAccount.qml:85
+#, kde-format
+msgctxt "@action:button"
+msgid "Export"
+msgstr "导出"
+
 #: src/contents/ui/HOTPAccountEntryView.qml:19
 #: src/contents/ui/TOTPAccountEntryView.qml:23
 #, kde-format
@@ -349,14 +384,14 @@ msgctxt "@item:inlistbox"
 msgid "andOTP Encrypted JSON"
 msgstr "andOTP 加密 JSON"
 
-#: src/contents/ui/ImportAccount.qml:64
+#: src/contents/ui/ImportAccount.qml:64 src/contents/ui/ExportAccount.qml:48
 #, kde-format
 msgctxt "@item:inlistbox"
 msgid "andOTP Plain JSON"
 msgstr "andOTP 明文 JSON"
 
 #. i18nc("@item:inlistbox", "Aegis Encrypted JSON"), value: Models.ValidatedImportInput.AegisEncryptedJSON});
-#: src/contents/ui/ImportAccount.qml:66
+#: src/contents/ui/ImportAccount.qml:66 src/contents/ui/ExportAccount.qml:49
 #, kde-format
 msgctxt "@item:inlistbox"
 msgid "Aegis Plain JSON"
@@ -380,7 +415,7 @@ msgctxt "@label:chooser"
 msgid "Backup file:"
 msgstr "备份文件："
 
-#: src/contents/ui/ImportAccount.qml:87
+#: src/contents/ui/ImportAccount.qml:87 src/contents/ui/ExportAccount.qml:68
 #, kde-format
 msgctxt "@info:placeholder"
 msgid "No file selected"

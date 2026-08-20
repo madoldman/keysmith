@@ -185,6 +185,19 @@ Kirigami.ScrollablePage {
             }
         },
         Kirigami.Action {
+            id: exportAction
+            text: i18nc("@action:button export accounts, shown in toolbar", "Export")
+            icon.name: "document-export"
+            enabled: vm.actionsEnabled
+            visible: vm.actionsEnabled
+            onTriggered: {
+                // FIXME : should be managed via vm
+                vm.accounts.error = false;
+                root.errorMessage = root.accountErrorMessage;
+                vm.exportAccount();
+            }
+        },
+        Kirigami.Action {
             id: scanQRCodeAction
             text: i18nc("@action:button import an account by scanning a QR code, shown in toolbar", "Scan QR Code")
             icon.name: "view-barcode-qr-symbolic"

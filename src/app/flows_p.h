@@ -9,6 +9,7 @@
 #include <QCommandLineParser>
 
 #include "../model/accounts.h"
+#include "../model/output.h"
 #include "../model/password.h"
 #include "keysmith.h"
 #include "vms.h"
@@ -89,6 +90,21 @@ private Q_SLOTS:
 private:
     Keysmith * const m_app;
     model::ImportInput * const m_input;
+};
+
+class ManualExportAccountFlow : public QObject
+{
+    Q_OBJECT
+public:
+    explicit ManualExportAccountFlow(Keysmith *app);
+    void run(void);
+private Q_SLOTS:
+    void back(void);
+    void onAccepted(void);
+
+private:
+    Keysmith *const m_app;
+    model::ExportOutput *const m_output;
 };
 
 class AddAccountFromQRFlow : public QObject

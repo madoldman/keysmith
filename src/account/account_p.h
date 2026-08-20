@@ -37,6 +37,7 @@ public:
     Account::Hash hash(void) const;
     Account::Algorithm algorithm(void) const;
     int tokenLength(void) const;
+    QString decryptedSecret(AccountSecret *key) const;
     bool checksum(void) const;
 
 public:

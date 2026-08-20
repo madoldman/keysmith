@@ -27,6 +27,7 @@
 #include "app/vms.h"
 #include "model/accounts.h"
 #include "model/input.h"
+#include "model/output.h"
 #include "validators/countervalidator.h"
 #include "validators/datetimevalidator.h"
 #include "validators/issuervalidator.h"
@@ -129,6 +130,12 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
                                                             "ImportAccountViewModel",
                                                             QStringLiteral("Should be automatically provided through Keysmith.Application.Navigation signals"));
 
+    qmlRegisterUncreatableType<app::ExportAccountViewModel>("Keysmith.Application",
+                                                            1,
+                                                            0,
+                                                            "ExportAccountViewModel",
+                                                            QStringLiteral("Should be automatically provided through Keysmith.Application.Navigation signals"));
+
     qmlRegisterUncreatableType<app::RenameAccountViewModel>("Keysmith.Application",
                                                             1,
                                                             0,
@@ -183,6 +190,7 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
     qmlRegisterType<model::AccountInput>("Keysmith.Models", 1, 0, "ValidatedAccountInput");
     qmlRegisterType<model::ImportInput>("Keysmith.Models", 1, 0, "ValidatedImportInput");
     qmlRegisterType<model::ImportInput>("Keysmith.Models", 1, 0, "ValidatedImportInput");
+    qmlRegisterType<model::ExportOutput>("Keysmith.Models", 1, 0, "ExportOutput");
     qmlRegisterType<model::SortedAccountsListModel>("Keysmith.Models", 1, 0, "SortedAccountListModel");
     qmlRegisterType<model::AccountNameValidator>("Keysmith.Validators", 1, 0, "AccountNameValidator");
     qmlRegisterType<validators::EpochValidator>("Keysmith.Validators", 1, 0, "TOTPEpochValidator");

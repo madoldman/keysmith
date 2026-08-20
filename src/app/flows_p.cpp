@@ -278,6 +278,40 @@ void ManualImportAccountFlow::back(void)
     QTimer::singleShot(0, this, &QObject::deleteLater);
 }
 
+ManualExportAccountFlow::ManualExportAccountFlow(Keysmith *app)
+    : QObject(app)
+    , m_app(app)
+    , m_output(new model::ExportOutput(this))
+{
+    Q_ASSERT_X(app, Q_FUNC_INFO, "should have a Keysmith instance");
+}
+
+void ManualExportAccountFlow::run(void)
+{
+    flowStateOf(m_app)->setFlowRunning(true);
+    overviewStateOf(m_app)->setActionsEnabled(false);
+
+    auto vm = new ExportAccountViewModel(m_output, accountListOf(m_app), false);
+    QObject::connect(vm, &ExportAccountViewModel::accepted, this, &ManualExportAccountFlow::onAccepted);
+    QObject::connect(vm, &ExportAccountViewModel::cancelled, this, &ManualExportAccountFlow::back);
+    navigationFor(m_app)->push(Navigation::Page::ExportAccount, vm);
+}
+
+void ManualExportAccountFlow::onAccepted(void)
+{
+    m_output->exportAccounts(storageOf(m_app));
+    QTimer::singleShot(0, this, &ManualExportAccountFlow::back);
+}
+
+void ManualExportAccountFlow::back(void)
+{
+    auto vm = new AccountsOverviewViewModel(m_app);
+    navigationFor(m_app)->navigate(Navigation::Page::AccountsOverview, vm);
+    overviewStateOf(m_app)->setActionsEnabled(true);
+    flowStateOf(m_app)->setFlowRunning(false);
+    QTimer::singleShot(0, this, &QObject::deleteLater);
+}
+
 ExternalCommandLineFlow::ExternalCommandLineFlow(Keysmith *app)
     : QObject(app)
     , m_app(app)

@@ -86,6 +86,12 @@ Account::Algorithm Account::algorithm(void) const
     return d->algorithm();
 }
 
+QString Account::decryptedSecret(AccountSecret *key) const
+{
+    Q_D(const Account);
+    return d->decryptedSecret(key);
+}
+
 void Account::recompute(void)
 {
     Q_D(Account);

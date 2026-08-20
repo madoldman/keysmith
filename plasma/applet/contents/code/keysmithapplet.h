@@ -9,6 +9,7 @@
 #include "app/keysmith.h"
 #include "model/accounts.h"
 #include "model/input.h"
+#include "model/output.h"
 #include "model/password.h"
 
 namespace accounts
@@ -118,6 +119,7 @@ public:
                                   bool useFixedTruncation,
                                   int truncationOffset);
     Q_INVOKABLE void importAccountsFromFile(const QString &filePath, int format, const QString &password);
+    Q_INVOKABLE bool exportAccountsToFile(const QString &filePath, int format);
     Q_INVOKABLE void removeAccount(int row);
     Q_INVOKABLE void copyToClipboard(const QString &text);
     Q_INVOKABLE bool providePassword(const QString &password);

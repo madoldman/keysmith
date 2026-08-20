@@ -5,6 +5,7 @@
 set(model_SRCS
     accounts.cpp
     input.cpp
+    output.cpp
     password.cpp
     qr.cpp
 )

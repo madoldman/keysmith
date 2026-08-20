@@ -1,0 +1,287 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: kdeorg\n"
+"Report-Msgid-Bugs-To: https://bugs.kde.org\n"
+"POT-Creation-Date: 2026-08-20 00:48+0000\n"
+"PO-Revision-Date: 2026-08-20 14:30\n"
+"Last-Translator: \n"
+"Language-Team: Chinese Simplified\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Crowdin-Project: kdeorg\n"
+"X-Crowdin-Project-ID: 269464\n"
+"X-Crowdin-Language: zh-CN\n"
+"X-Crowdin-File: /kf6-trunk/messages/keysmith/plasma_applet_org.kde.plasma."
+"keysmith.pot\n"
+
+#: contents/ui/main.qml:28
+msgid "OTP Accounts"
+msgstr "OTP 账户"
+
+#: contents/ui/main.qml:37
+msgid "Set Up Password"
+msgstr "设置密码"
+
+#: contents/ui/main.qml:49
+msgid "Set a master password to encrypt your accounts:"
+msgstr "设置主密码以加密您的账户："
+
+#: contents/ui/main.qml:55 contents/ui/main.qml:484
+msgid "Password:"
+msgstr "密码："
+
+#: contents/ui/main.qml:62 contents/ui/main.qml:141
+msgid "Enter password"
+msgstr "输入密码"
+
+#: contents/ui/main.qml:67
+msgid "Confirm Password:"
+msgstr "确认密码："
+
+#: contents/ui/main.qml:74
+msgid "Confirm password"
+msgstr "确认密码"
+
+#: contents/ui/main.qml:89
+msgid "Set Password"
+msgstr "设置密码"
+
+#: contents/ui/main.qml:98
+msgid "Passwords do not match"
+msgstr "两次输入的密码不一致"
+
+#: contents/ui/main.qml:105
+msgid "Failed to set password"
+msgstr "设置密码失败"
+
+#: contents/ui/main.qml:121
+msgid "Unlock Accounts"
+msgstr "解锁账户"
+
+#: contents/ui/main.qml:133
+msgid "Enter your master password to unlock your accounts:"
+msgstr "输入主密码以解锁您的账户："
+
+#: contents/ui/main.qml:157
+msgid "Unlock"
+msgstr "解锁"
+
+#: contents/ui/main.qml:166
+msgid "Incorrect password"
+msgstr "密码错误"
+
+#: contents/ui/main.qml:182 contents/ui/main.qml:631
+msgid "Add Account"
+msgstr "添加账户"
+
+#: contents/ui/main.qml:190 contents/ui/main.qml:505
+msgid "Import"
+msgstr "导入"
+
+#: contents/ui/main.qml:198 contents/ui/main.qml:607
+msgid "Export"
+msgstr "导出"
+
+#: contents/ui/main.qml:278
+msgid "Delete account"
+msgstr "删除账户"
+
+#: contents/ui/main.qml:342
+msgid "Accounts are locked"
+msgstr "账户已锁定"
+
+#: contents/ui/main.qml:342
+msgid "No accounts added"
+msgstr "尚未添加任何账户"
+
+#: contents/ui/main.qml:353
+msgid "Removing account: %1"
+msgstr "移除账户：%1"
+
+#: contents/ui/main.qml:369
+msgid ""
+"<p><ul><li>Account name: %1</li><li>Account issuer: %2</li></ul></"
+"p><p>Removing this account from Keysmith will not disable two-factor "
+"authentication (2FA). Make sure you can still access your account without "
+"using Keysmith before proceeding:</p><ul><li>Make sure you have another 2FA "
+"app set up for your account, or:</li><li>Make sure you have recovery codes "
+"for your account, or:</li><li>Disable two-factor authentication on your "
+"account</li></ul>"
+msgstr ""
+"<p><ul><li>账户名：%1</li><li>账户发行者：%2</li></ul></p><p>从 Keysmith 中移"
+"除此账户将不会禁用双重身份验证 (2FA)。请在继续操作之前确保在不使用 Keysmith "
+"的前提下依然能够访问您的账户：</p><ul><li>确保您的账号已经设置了另一款双重身"
+"份验证应用，或者：</li><li>确保您拥有您的账户的恢复码，或者：</li><li>禁用您"
+"的账户的双重身份验证功能。</li></ul>"
+
+#: contents/ui/main.qml:377
+msgid "N/A"
+msgstr "无"
+
+#: contents/ui/main.qml:387 contents/ui/main.qml:501 contents/ui/main.qml:603
+#: contents/ui/main.qml:828
+msgid "Cancel"
+msgstr "取消"
+
+#: contents/ui/main.qml:392
+msgid "Delete Account"
+msgstr "删除账户"
+
+#: contents/ui/main.qml:415
+msgid "Import Accounts"
+msgstr "导入账户"
+
+#: contents/ui/main.qml:431
+msgid "Import Format:"
+msgstr "导入格式："
+
+#: contents/ui/main.qml:441
+msgid "andOTP Encrypted JSON"
+msgstr "andOTP 加密 JSON"
+
+#: contents/ui/main.qml:442 contents/ui/main.qml:553
+msgid "andOTP Plain JSON"
+msgstr "andOTP 明文 JSON"
+
+#: contents/ui/main.qml:443 contents/ui/main.qml:554
+msgid "Aegis Plain JSON"
+msgstr "Aegis 明文 JSON"
+
+#: contents/ui/main.qml:444
+msgid "FreeOTP URIs"
+msgstr "FreeOTP URI"
+
+#: contents/ui/main.qml:445
+msgid "SailOTP manually decrypted json"
+msgstr "SailOTP 手动解密的 JSON"
+
+#: contents/ui/main.qml:453
+msgid "Select file:"
+msgstr "选择文件："
+
+#: contents/ui/main.qml:462 contents/ui/main.qml:571
+msgid "No file selected"
+msgstr "没有选择文件"
+
+#: contents/ui/main.qml:466 contents/ui/main.qml:575
+msgid "Browse..."
+msgstr "浏览..."
+
+#: contents/ui/main.qml:473
+msgid "Select file to import"
+msgstr "选择要导入的文件"
+
+#: contents/ui/main.qml:493
+msgid "Enter decryption password"
+msgstr "输入解密密码"
+
+#: contents/ui/main.qml:528
+msgid "Export Accounts"
+msgstr "导出账户"
+
+#: contents/ui/main.qml:543
+msgid "Export Format:"
+msgstr "导出格式："
+
+#: contents/ui/main.qml:562
+msgid "Export file:"
+msgstr "导出文件："
+
+#: contents/ui/main.qml:582
+msgid "Select export file"
+msgstr "选择导出文件"
+
+#: contents/ui/main.qml:618
+msgid "Accounts exported successfully"
+msgstr "账户导出成功"
+
+#: contents/ui/main.qml:618
+msgid "Failed to export accounts"
+msgstr "账户导出失败"
+
+#: contents/ui/main.qml:651
+msgid "Account Name:"
+msgstr "账户名称："
+
+#: contents/ui/main.qml:659
+msgid "Enter account name"
+msgstr "输入账户名称"
+
+#: contents/ui/main.qml:663
+msgid "Issuer:"
+msgstr "颁发者："
+
+#: contents/ui/main.qml:671
+msgid "Enter issuer (optional)"
+msgstr "输入颁发者（可选）"
+
+#: contents/ui/main.qml:675
+msgid "Secret Key (Base32):"
+msgstr "密钥（Base32）："
+
+#: contents/ui/main.qml:683
+msgid "Enter base32 secret key"
+msgstr "输入 Base32 密钥"
+
+#: contents/ui/main.qml:688
+msgid "Token Type:"
+msgstr "令牌类型："
+
+#: contents/ui/main.qml:698
+msgid "TOTP (Time-based)"
+msgstr "TOTP（基于时间）"
+
+#: contents/ui/main.qml:704
+msgid "HOTP (Counter-based)"
+msgstr "HOTP（基于计数器）"
+
+#: contents/ui/main.qml:715
+msgid "TOTP Settings:"
+msgstr "TOTP 设置："
+
+#: contents/ui/main.qml:722
+msgid "Time Step (seconds):"
+msgstr "时间步（秒）："
+
+#: contents/ui/main.qml:733 contents/ui/main.qml:789
+msgid "Token Length:"
+msgstr "令牌长度："
+
+#: contents/ui/main.qml:745
+msgid "Algorithm:"
+msgstr "算法："
+
+#: contents/ui/main.qml:755
+msgid "Epoch (optional):"
+msgstr "Epoch（可选）："
+
+#: contents/ui/main.qml:758
+msgid "Leave empty for Unix epoch"
+msgstr "留空则使用 Unix epoch"
+
+#: contents/ui/main.qml:771
+msgid "HOTP Settings:"
+msgstr "HOTP 设置："
+
+#: contents/ui/main.qml:778
+msgid "Counter:"
+msgstr "计数器："
+
+#: contents/ui/main.qml:782
+msgid "Enter counter value"
+msgstr "输入计数器值"
+
+#: contents/ui/main.qml:801
+msgid "Add checksum digit"
+msgstr "添加校验和数字"
+
+#: contents/ui/main.qml:806
+msgid "Use custom truncation offset"
+msgstr "使用自定义截断偏移量"
+
+#: contents/ui/main.qml:834
+msgid "Add"
+msgstr "添加"

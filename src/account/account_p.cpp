@@ -5,6 +5,7 @@
 #include "account_p.h"
 #include "validation.h"
 
+#include "../base32/base32.h"
 #include "../logging_p.h"
 
 #include <QObject>
@@ -72,6 +73,20 @@ int AccountPrivate::tokenLength(void) const
 bool AccountPrivate::checksum(void) const
 {
     return m_checksum;
+}
+
+QString AccountPrivate::decryptedSecret(AccountSecret *key) const
+{
+    if (!key) {
+        return QString();
+    }
+    secrets::SecureMemory *raw = key->decrypt(m_secret);
+    if (!raw) {
+        return QString();
+    }
+    QByteArray data(reinterpret_cast<const char *>(raw->constData()), raw->size());
+    delete raw;
+    return base32::encode(data);
 }
 
 void AccountPrivate::setCounter(quint64 counter)

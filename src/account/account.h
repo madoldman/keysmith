@@ -52,6 +52,7 @@ public:
     bool checksum(void) const;
     Hash hash(void) const;
     Algorithm algorithm(void) const;
+    QString decryptedSecret(AccountSecret *key) const;
 public Q_SLOTS:
     void remove(void);
     void recompute(void);

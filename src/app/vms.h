@@ -7,6 +7,7 @@
 
 #include "../account/account.h"
 #include "../model/accounts.h"
+#include "../model/output.h"
 #include "../model/password.h"
 #include "keysmith.h"
 
@@ -158,6 +159,7 @@ public:
 public Q_SLOTS:
     void addNewAccount(void);
     void importAccount(void);
+    void exportAccount(void);
     void scanQRCode(void);
 Q_SIGNALS:
     void actionsEnabledChanged(void);
@@ -165,6 +167,27 @@ Q_SIGNALS:
 private:
     Keysmith *const m_app;
     model::SimpleAccountListModel *const m_accounts;
+};
+
+class ExportAccountViewModel : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(model::ExportOutput *output READ output CONSTANT)
+    Q_PROPERTY(model::SimpleAccountListModel *accounts READ accounts CONSTANT)
+    Q_PROPERTY(bool quitEnabled READ quitEnabled CONSTANT)
+public:
+    explicit ExportAccountViewModel(model::ExportOutput *output, model::SimpleAccountListModel *accounts, bool quitEnabled, QObject *parent = nullptr);
+    model::ExportOutput *output(void) const;
+    model::SimpleAccountListModel *accounts(void) const;
+    bool quitEnabled(void) const;
+Q_SIGNALS:
+    void cancelled(void);
+    void accepted(void);
+
+private:
+    model::ExportOutput *const m_output;
+    model::SimpleAccountListModel *const m_accounts;
+    const bool m_quitEnabled;
 };
 
 class ScanQRViewModel : public QObject

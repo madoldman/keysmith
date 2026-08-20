@@ -24,6 +24,7 @@ public:
         Error,
         AddAccount,
         ImportAccount,
+        ExportAccount,
         RenameAccount,
         AccountsOverview,
         SetupPassword,

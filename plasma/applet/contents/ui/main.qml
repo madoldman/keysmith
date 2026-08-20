@@ -195,6 +195,14 @@ PlasmoidItem {
                     }
 
                     QQC2.Button {
+                        text: i18n("Export")
+                        icon.name: "document-export"
+                        onClicked: exportDialog.open()
+                        Layout.fillWidth: true
+                        enabled: !Keysmith.locked && !Keysmith.needsSetup
+                    }
+
+                    QQC2.Button {
                         icon.name: "view-refresh"
                         onClicked: Keysmith.refresh()
                         Layout.preferredWidth: height
@@ -512,6 +520,109 @@ PlasmoidItem {
                 onRejected: {
                     filePathField.text = ""
                     passwordField.text = ""
+                }
+            }
+
+            QQC2.Dialog {
+                id: exportDialog
+                title: i18n("Export Accounts")
+                width: Math.min(380, page.width - Kirigami.Units.largeSpacing * 4)
+                height: 280
+                modal: true
+                visible: false
+                closePolicy: QQC2.Popup.CloseOnEscape | QQC2.Popup.CloseOnPressOutside
+
+                property int selectedFormat: 0
+
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: Kirigami.Units.largeSpacing
+                    spacing: Kirigami.Units.smallSpacing
+
+                    QQC2.Label {
+                        text: i18n("Export Format:")
+                        font.bold: true
+                        Layout.fillWidth: true
+                    }
+
+                    QQC2.ComboBox {
+                        id: exportFormatCombo
+                        Layout.fillWidth: true
+                        currentIndex: 0
+                        model: [
+                            i18n("andOTP Plain JSON"),
+                            i18n("Aegis Plain JSON")
+                        ]
+                        onCurrentIndexChanged: {
+                            exportDialog.selectedFormat = currentIndex
+                        }
+                    }
+
+                    QQC2.Label {
+                        text: i18n("Export file:")
+                        font.bold: true
+                        Layout.fillWidth: true
+                    }
+
+                    QQC2.TextField {
+                        id: exportFilePathField
+                        Layout.fillWidth: true
+                        readOnly: true
+                        placeholderText: i18n("No file selected")
+                    }
+
+                    QQC2.Button {
+                        text: i18n("Browse...")
+                        Layout.fillWidth: true
+                        onClicked: exportFileDialog.open()
+                    }
+
+                    Dialogs.FileDialog {
+                        id: exportFileDialog
+                        title: i18n("Select export file")
+                        fileMode: Dialogs.FileDialog.SaveFile
+                        onAccepted: {
+                            var path = selectedFile.toString()
+                            if (path.startsWith("file://")) {
+                                path = path.substring(7)
+                            }
+                            exportFilePathField.text = path
+                        }
+                    }
+
+                    QQC2.Label {
+                        id: exportResultLabel
+                        visible: false
+                        Layout.fillWidth: true
+                        wrapMode: Text.WordWrap
+                    }
+                }
+
+                footer: QQC2.DialogButtonBox {
+                    QQC2.Button {
+                        text: i18n("Cancel")
+                        QQC2.DialogButtonBox.buttonRole: QQC2.DialogButtonBox.RejectRole
+                    }
+                    QQC2.Button {
+                        text: i18n("Export")
+                        highlighted: true
+                        enabled: exportFilePathField.text.length > 0
+                        QQC2.DialogButtonBox.buttonRole: QQC2.DialogButtonBox.AcceptRole
+                    }
+                }
+
+                onAccepted: {
+                    // ExportFormat enum: AndOTPPlainJSON=0, AegisPlainJSON=1
+                    var success = Keysmith.exportAccountsToFile(exportFilePathField.text, exportDialog.selectedFormat)
+                    exportResultLabel.visible = true
+                    exportResultLabel.text = success ? i18n("Accounts exported successfully") : i18n("Failed to export accounts")
+                    exportResultLabel.color = success ? Kirigami.Theme.positiveTextColor : Kirigami.Theme.negativeTextColor
+                    exportFilePathField.text = ""
+                }
+
+                onRejected: {
+                    exportFilePathField.text = ""
+                    exportResultLabel.visible = false
                 }
             }
 

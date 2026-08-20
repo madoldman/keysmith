@@ -12,6 +12,7 @@
 #include "app/keysmith.h"
 #include "model/accounts.h"
 #include "model/input.h"
+#include "model/output.h"
 
 KeysmithApplet::KeysmithApplet(QObject *parent)
     : QObject(parent)
@@ -359,6 +360,19 @@ void KeysmithApplet::importAccountsFromFile(const QString &filePath, int format,
     for (std::unique_ptr<model::AccountInput> &accInput : accounts) {
         m_keysmith->accountListModel()->addAccount(accInput.get());
     }
+}
+
+bool KeysmithApplet::exportAccountsToFile(const QString &filePath, int format)
+{
+    if (!m_keysmith) {
+        return false;
+    }
+
+    model::ExportOutput output;
+    output.setFile(filePath);
+    output.setFormat(static_cast<model::ExportOutput::ExportFormat>(format));
+
+    return output.exportAccounts(m_keysmith->store().accounts());
 }
 
 void KeysmithApplet::removeAccount(int row)

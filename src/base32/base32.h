@@ -16,5 +16,7 @@ std::optional<size_t> validate(const QString &encoded, int from = 0, int until =
 std::optional<size_t> decode(const QString &encoded, char *const out, size_t outlen, int from = 0, int until = -1);
 
 std::optional<QByteArray> decode(const QString &input);
+
+QString encode(const QByteArray &data);
 }
 #endif
