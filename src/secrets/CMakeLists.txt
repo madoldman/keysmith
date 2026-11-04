@@ -8,4 +8,5 @@ set(secret_SRCS
 
 add_library(secrets_lib STATIC ${secret_SRCS})
 set_target_properties(secrets_lib PROPERTIES POSITION_INDEPENDENT_CODE ON)
-target_link_libraries(secrets_lib Qt::Core base32_lib sodium)
+
+target_link_libraries(secrets_lib Qt::Core sodium base32_lib)
