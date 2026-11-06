@@ -308,22 +308,29 @@ PlasmoidItem {
                             id: countdownAnim
                             target: listItem
                             property: "healthIndicator"
-                            from: listItem.isTotp && listItem.index >= 0 ? Keysmith.accountsModel.millisecondsLeftForToken(listItem.index) : 0
+                            // millisecondsLeftForToken 在模型未就绪/行号无效时可能返回 -1 或 0，
+                            // duration/from 为 0 或负值会导致动画立即结束并被反复重启；加下限保护
+                            from: listItem.isTotp && listItem.index >= 0 ? Math.max(1000, Keysmith.accountsModel.millisecondsLeftForToken(listItem.index)) : 0
                             to: 0
-                            duration: listItem.isTotp && listItem.index >= 0 ? Keysmith.accountsModel.millisecondsLeftForToken(listItem.index) : 0
+                            duration: listItem.isTotp && listItem.index >= 0 ? Math.max(1000, Keysmith.accountsModel.millisecondsLeftForToken(listItem.index)) : 0
                             running: listItem.isTotp && listItem.visible
                         }
 
                         Timer {
                             id: totpTimer
                             running: listItem.isTotp && listItem.visible
-                            interval: listItem.isTotp ? Keysmith.accountsModel.millisecondsLeftForToken(listItem.index) : 0
+                            // index < 0（模型未就绪）时 millisecondsLeftForToken 返回 -1，
+                            // 0/负值 interval 会形成零间隔自触发循环；下限 1000ms 保证
+                            // 即使底层返回异常值也不会 busy-loop。正常 30s 节奏不受影响。
+                            interval: listItem.isTotp && listItem.index >= 0 ? Math.max(1000, Keysmith.accountsModel.millisecondsLeftForToken(listItem.index)) : 1000
                             onTriggered: {
                                 if (listItem.isTotp) {
                                     totpTimer.stop()
                                     countdownAnim.stop()
                                     Keysmith.accountsModel.recompute(listItem.index)
                                     var phase = Keysmith.accountsModel.millisecondsLeftForToken(listItem.index)
+                                    // 重算后取到的剩余时间同样可能是 0/-1（模型重置瞬间），统一钳到 >= 1000ms
+                                    phase = Math.max(1000, phase)
                                     totpTimer.interval = phase
                                     listItem.healthIndicator = phase
                                     countdownAnim.duration = phase

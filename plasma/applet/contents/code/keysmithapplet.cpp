@@ -201,7 +201,10 @@ void AccountsModel::setSourceModel(model::SimpleAccountListModel *source)
             model::AccountView *account = qvariant_cast<model::AccountView *>(data);
             if (account) {
                 m_accounts.append(account);
-                connect(account, &model::AccountView::tokenChanged, this, &AccountsModel::onTokenChanged);
+                // 模型可能被反复重建（启动期多次 setSourceModel），AccountView 自身被复用；
+                // 用 UniqueConnection 防止同一 account 的 tokenChanged 被重复连接，
+                // 避免同一 token 变更触发多次 dataChanged。
+                connect(account, &model::AccountView::tokenChanged, this, &AccountsModel::onTokenChanged, Qt::UniqueConnection);
             }
         }
         std::sort(m_accounts.begin(), m_accounts.end(), [](const model::AccountView *a, const model::AccountView *b) {
@@ -221,7 +224,14 @@ void AccountsModel::setSourceModel(model::SimpleAccountListModel *source)
     }
 
     endResetModel();
-    triggerRecompute();
+    // 不再无条件立即全量重算：启动/加载期本函数会被连续调用多次（loadedChanged/
+    // added/removed/keyAvailable 各自触发 refreshModel()），直接触发会形成 O(N²)
+    // 的重算突发。改为 50ms 合并窗口，窗口内多次重建只产生一次全量重算，且
+    // 触发时 m_accounts 已是最终列表。正常使用场景（展开面板时 recomputeAll()
+    // 单次调用）距上次触发远超 50ms，仍会立即执行，不影响首次展开显示正确令牌。
+    if (!m_recomputeCoalescer.isActive()) {
+        m_recomputeCoalescer.start();
+    }
 }
 
 QVariant AccountsModel::data(const QModelIndex &index, int role) const
@@ -261,6 +271,16 @@ void AccountsModel::recompute(int row)
     if (row < 0 || row >= m_accounts.count()) {
         return;
     }
+
+    // in-flight 去重：QML 侧多个 Timer/信号可能在极短时间内对同一账号重复请求重算，
+    // 每次 Q_EMIT 都会在 Dispatcher 队列里排一个 job；短窗口内同一行的重复请求直接忽略，
+    // 防止 job 堆积（配合 hmac 修复，避免退化后的计算把工作线程占满）。
+    if (m_lastRecomputeRow == row && m_lastRecomputeAt.isValid() && m_lastRecomputeAt.elapsed() < 500) {
+        return;
+    }
+    m_lastRecomputeRow = row;
+    m_lastRecomputeAt.restart();
+
     Q_EMIT m_accounts[row]->recompute();
 }
 

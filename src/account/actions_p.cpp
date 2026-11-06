@@ -610,6 +610,44 @@ computeToken(const AccountSecret *accountSecret, const secrets::EncryptedSecret 
     return algorithm.compute(counter, reinterpret_cast<char *>(secret->data()), secret->size());
 }
 
+/*
+ * 从已解密的 SecureMemory 计算 token：一次 ComputeTotp::run() 需要 token 与
+ * nextToken 两次计算，之前每次都重复走 decrypt()（sodium_malloc/mlock/munlock）。
+ * 解密一次后两份 token 复用同一受保护内存即可。
+ * 注意必须每次从 SecureMemory 拷贝工作副本：hmac_stage() 会对 key buffer 原地
+ * XOR（先 ^0x36 再 ^0x5c），Algorithm::compute() 直接写入传入的 buffer；若把
+ * secret->data() 直接传入，第二次计算（nextToken）会拿到已被污染成 key^0x5c
+ * 的错误密钥，令牌值将不一致。
+ */
+static std::optional<QString> computeTokenFromSecret(const oath::Algorithm &algorithm, quint64 counter, const secrets::SecureMemory *secret)
+{
+    // 与原实现（computeToken）保持一致：仅判空，不额外拦截 size==0 的情形，
+    // 确保 ksize/校验路径的行为与修复前完全相同
+    if (!secret) {
+        qCDebug(logger) << "Unable to compute token: invalid decrypted secret";
+        return std::nullopt;
+    }
+
+    QByteArray workingCopy(reinterpret_cast<const char *>(secret->constData()), static_cast<int>(secret->size()));
+
+    /*
+     * RAII 清零 guard：workingCopy 是 OTP 密钥的明文副本，位于普通堆上，
+     * QByteArray 析构不会清零，明文会残留在已释放的堆内存里；原实现中密钥
+     * 只存在于 sodium_malloc 的 SecureMemory 里、由 sodium_free 清零（见
+     * secrets.cpp），复用解密结果引入此副本后必须补上等价的擦除行为。
+     * 放在作用域上保证包括未来新增提前 return 在内的所有路径都会清零。
+     */
+    struct ZeroOnExit {
+        QByteArray &buf;
+        ~ZeroOnExit()
+        {
+            sodium_memzero(buf.data(), buf.size());
+        }
+    } zeroOnExit{workingCopy};
+
+    return algorithm.compute(counter, workingCopy.data(), workingCopy.size());
+}
+
 ComputeTotp::ComputeTotp(const AccountSecret *secret,
                          const secrets::EncryptedSecret &tokenSecret,
                          uint tokenLength,
@@ -694,8 +732,18 @@ void ComputeTotp::run(void)
         return;
     }
 
-    const auto token = computeToken(m_secret, m_tokenSecret, *algorithm, counterValue);
-    const auto nextToken = token ? computeToken(m_secret, m_tokenSecret, *algorithm, counterValue + 1ULL) : std::nullopt;
+    // 只解密一次，token 与 nextToken 复用同一受保护内存（原先重复 decrypt 两次，
+    // 每次 sodium_malloc/mlock/munlock 有可测开销）；令牌值不受影响：计算在独立
+    // 工作副本上进行，原 buffer 不被 hmac_stage 的原地 XOR 污染。
+    QScopedPointer<secrets::SecureMemory> secret(m_secret->decrypt(m_tokenSecret));
+    if (!secret) {
+        qCDebug(logger) << "Failed to compute TOTP tokens: failed to decrypt account secret";
+        Q_EMIT finished();
+        return;
+    }
+
+    const auto token = computeTokenFromSecret(*algorithm, counterValue, secret.data());
+    const auto nextToken = token ? computeTokenFromSecret(*algorithm, counterValue + 1ULL, secret.data()) : std::nullopt;
     if (token && nextToken) {
         Q_EMIT otp(*token, *nextToken, *validFrom, *validUntil);
     } else {

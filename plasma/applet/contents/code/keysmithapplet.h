@@ -2,6 +2,7 @@
 #define KEYSMITH_APPLET_H
 
 #include <QAbstractListModel>
+#include <QElapsedTimer>
 #include <QObject>
 #include <QQmlEngine>
 #include <QTimer>
@@ -33,6 +34,15 @@ public:
     explicit AccountsModel(QObject *parent = nullptr)
         : QAbstractListModel(parent)
     {
+        // 合并窗口结束时的真正全量重算；触发时 m_accounts 已是最新列表，
+        // 启动期连续多次 setSourceModel 只产生一次全量重算。
+        m_recomputeCoalescer.setSingleShot(true);
+        m_recomputeCoalescer.setInterval(50);
+        QObject::connect(&m_recomputeCoalescer, &QTimer::timeout, this, [this]() {
+            for (auto *account : m_accounts) {
+                Q_EMIT account->recompute();
+            }
+        });
     }
 
     void setSourceModel(model::SimpleAccountListModel *source);
@@ -67,6 +77,16 @@ public:
 
     QVector<model::AccountView *> m_accounts;
     model::SimpleAccountListModel *m_source = nullptr;
+
+private:
+    // 合并触发窗口：启动/加载期 loadedChanged/added/removed/keyAvailable 会在极短时间内
+    // 连续多次调用 refreshModel() -> setSourceModel()（每次无条件全量重算 N 个账号，
+    // 形成 O(N²) 突发）。用单次 QTimer 把窗口内的多次全量重算合并为一次。
+    QTimer m_recomputeCoalescer;
+    // in-flight 去重：记录最近一次单行 recompute 请求的行号与时间，
+    // 同一行在短窗口内重复请求直接忽略，避免相同 job 在 Dispatcher 队列里堆积。
+    int m_lastRecomputeRow = -1;
+    QElapsedTimer m_lastRecomputeAt;
 };
 
 class KeysmithApplet : public QObject

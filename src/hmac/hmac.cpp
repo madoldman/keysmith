@@ -5,7 +5,52 @@
 #include "hmac.h"
 #include "../logging_p.h"
 
+#include <memory>
+#include <optional>
+
 KEYSMITH_LOGGER(logger, ".hmac")
+
+namespace
+{
+/*
+ * 复用 QCryptographicHash 实例（性能修复）：
+ * 实测在本机 OpenSSL 4（libcrypto.so.4）下，每次构造/析构 QCryptographicHash 都会触发
+ * EVP_MD_fetch / OSSL_PROVIDER_unload 与大范围 CRYPTO_zalloc（逐页 mprotect），
+ * 且单次成本随进程累计构造次数线性退化：微基准每轮构造/析构 500 次，
+ * 第 0 轮约 0.064ms/次，第 7 轮退化到约 0.828ms/次（涨 13 倍）。
+ * keysmith 的工作线程长期常驻，每个 TOTP token 经两次 hmac_stage，每 30 秒全量重算，
+ * 数百万次累计构造后退化到每次数百毫秒，把 Dispatcher 工作线程占满一整个核。
+ * 对照实测：复用同一实例并 reset() 后 8 轮 x 500 次全部约 0ms、零退化，
+ * 且 reset()+addData()+result() 与新建对象的结果逐字节一致，令牌值不受影响。
+ */
+class ReusableHash
+{
+public:
+    /*
+     * 取得可复用实例：算法不变时 reset() 后与新构造对象等价；
+     * 算法变化（跨账号切换 SHA1/SHA256/SHA512）时销毁重建，频率极低。
+     */
+    QCryptographicHash &acquire(QCryptographicHash::Algorithm requested)
+    {
+        if (!m_hash || m_algorithm != requested) {
+            m_hash = std::make_unique<QCryptographicHash>(requested);
+            m_algorithm = requested;
+        } else {
+            m_hash->reset();
+        }
+        return *m_hash;
+    }
+
+private:
+    std::unique_ptr<QCryptographicHash> m_hash;
+    std::optional<QCryptographicHash::Algorithm> m_algorithm;
+};
+
+// 按工作线程各持一份缓存：工作线程是单一 Dispatcher 线程，thread_local 天然线程安全。
+// hmac_stage 与长 key 摘要（ksize > blockSize 分支）分开持有，避免两处中间状态互相影响。
+thread_local ReusableHash stageHashInstance;
+thread_local ReusableHash keyHashInstance;
+}
 
 static QByteArray hmac_stage(QCryptographicHash::Algorithm algorithm,
                              char *const keyBuf,
@@ -15,7 +60,8 @@ static QByteArray hmac_stage(QCryptographicHash::Algorithm algorithm,
                              const char xorKey,
                              const QByteArray &message)
 {
-    QCryptographicHash hash(algorithm);
+    // 复用而非重新构造：见 ReusableHash 类注释（构造/析构成本随累计调用次数线性退化）
+    QCryptographicHash &hash = stageHashInstance.acquire(algorithm);
     int count;
     for (count = 0; count < ksize; ++count) {
         keyBuf[count] ^= xorKey;
@@ -121,7 +167,8 @@ std::optional<QByteArray> compute(QCryptographicHash::Algorithm algorithm, char 
     QByteArray hashedKey;
 
     if (ksize > bs) {
-        QCryptographicHash khash(algorithm);
+        // 长 key 摘要同样复用实例（独立于 stage 用的实例），理由见 ReusableHash 类注释
+        QCryptographicHash &khash = keyHashInstance.acquire(algorithm);
         khash.addData(QByteArrayView(rawKey, ksize));
         hashedKey = khash.result();
         rawKey = hashedKey.data();
